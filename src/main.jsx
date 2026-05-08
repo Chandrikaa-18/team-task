@@ -477,9 +477,27 @@ function ProjectDetail({ token, projectId, refreshKey, onRefresh, onProjectDelet
                     <span>{task.due_date ? new Date(task.due_date).toLocaleDateString() : 'No due date'}</span>
                   </div>
                   <div className="task-controls">
-                    <select value={task.status} onChange={(e) => updateTask(task, { status: e.target.value })} aria-label="Task status">
-                      {statuses.map((next) => <option key={next} value={next}>{label(next)}</option>)}
-                    </select>
+                    {!isProjectAdmin && user.id === task.assignee_id ? (
+                      <div className="member-actions-row">
+                        {task.status !== 'in_progress' && (
+                          <button className="quick-action in-progress-btn" onClick={() => updateTask(task, { status: 'in_progress' })} title="Move to In Progress">
+                            <Clock3 size={14} /> In Progress
+                          </button>
+                        )}
+                        {task.status !== 'done' && (
+                          <button className="quick-action completed-btn" onClick={() => updateTask(task, { status: 'done' })} title="Mark as Completed">
+                            <CheckCircle2 size={14} /> Completed
+                          </button>
+                        )}
+                        <select value={task.status} onChange={(e) => updateTask(task, { status: e.target.value })} aria-label="Task status" className="hidden-select">
+                          {statuses.map((next) => <option key={next} value={next}>{label(next)}</option>)}
+                        </select>
+                      </div>
+                    ) : (
+                      <select value={task.status} onChange={(e) => updateTask(task, { status: e.target.value })} aria-label="Task status">
+                        {statuses.map((next) => <option key={next} value={next}>{label(next)}</option>)}
+                      </select>
+                    )}
                     {isProjectAdmin && (
                       <select value={task.priority} onChange={(event) => updateTask(task, { priority: event.target.value })} aria-label="Task priority">
                         {priorities.map((priority) => <option key={priority} value={priority}>{label(priority)}</option>)}
